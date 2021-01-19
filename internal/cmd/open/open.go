@@ -5,9 +5,9 @@ import (
 
 	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
+	"github.com/ankitpokhrel/jira-cli/internal/config"
 )
 
 const (
@@ -33,12 +33,13 @@ func NewCmdOpen() *cobra.Command {
 }
 
 func open(_ *cobra.Command, args []string) {
-	server := viper.GetString("server")
+	server := config.GetServer()
+	project := config.GetProject()
 
 	var url string
 
 	if len(args) == 0 {
-		url = fmt.Sprintf("%s/browse/%s", server, viper.GetString("project"))
+		url = fmt.Sprintf("%s/browse/%s", server, project)
 	} else {
 		url = fmt.Sprintf("%s/browse/%s", server, args[0])
 	}

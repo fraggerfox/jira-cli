@@ -5,10 +5,10 @@ import (
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/ankitpokhrel/jira-cli/api"
 	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
+	"github.com/ankitpokhrel/jira-cli/internal/config"
 	"github.com/ankitpokhrel/jira-cli/internal/query"
 	"github.com/ankitpokhrel/jira-cli/pkg/jira"
 	"github.com/ankitpokhrel/jira-cli/pkg/surveyext"
@@ -37,8 +37,8 @@ func NewCmdCreate() *cobra.Command {
 }
 
 func create(cmd *cobra.Command, _ []string) {
-	server := viper.GetString("server")
-	project := viper.GetString("project")
+	server := config.GetServer()
+	project := config.GetProject()
 
 	flags := parseFlags(cmd.Flags())
 	qs := getQuestions(flags)
@@ -71,7 +71,7 @@ func create(cmd *cobra.Command, _ []string) {
 			Body:          flags.body,
 			Priority:      flags.priority,
 			Labels:        flags.labels,
-			EpicFieldName: viper.GetString("epic.field"),
+			EpicFieldName: config.GetEpicField(),
 		})
 		cmdutil.ExitIfError(err)
 

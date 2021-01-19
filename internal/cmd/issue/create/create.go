@@ -5,10 +5,10 @@ import (
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/ankitpokhrel/jira-cli/api"
 	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
+	"github.com/ankitpokhrel/jira-cli/internal/config"
 	"github.com/ankitpokhrel/jira-cli/internal/query"
 	"github.com/ankitpokhrel/jira-cli/pkg/jira"
 	"github.com/ankitpokhrel/jira-cli/pkg/surveyext"
@@ -37,8 +37,8 @@ func NewCmdCreate() *cobra.Command {
 }
 
 func create(cmd *cobra.Command, _ []string) {
-	server := viper.GetString("server")
-	project := viper.GetString("project")
+	server := config.GetServer()
+	project := config.GetProject()
 
 	params := parseFlags(cmd.Flags())
 	client := api.Client(jira.Config{Debug: params.debug})
@@ -116,13 +116,14 @@ type createCmd struct {
 }
 
 func (cc *createCmd) setIssueTypes() error {
-	issueTypes := make([]*jira.IssueType, 0)
-	availableTypes, ok := viper.Get("issue.types").([]interface{})
+	availableTypes, ok := config.GetIssueTypes().([]interface{})
 	if !ok {
 		return fmt.Errorf("invalid issue types in config")
 	}
+
+	issueTypes := make([]*jira.IssueType, 0)
 	for _, at := range availableTypes {
-		tp := at.(map[interface{}]interface{})
+		tp := at.(map[string]interface{})
 		st := tp["subtask"].(bool)
 		if st {
 			continue

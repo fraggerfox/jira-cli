@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+
+	"github.com/ankitpokhrel/jira-cli/internal/config"
 )
 
 // NewCmdMe is a me command.
@@ -18,5 +19,5 @@ func NewCmdMe() *cobra.Command {
 }
 
 func me(*cobra.Command, []string) {
-	fmt.Println(viper.GetString("login"))
+	fmt.Println(config.GetLogin())
 }

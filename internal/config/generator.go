@@ -16,11 +16,6 @@ import (
 	"github.com/ankitpokhrel/jira-cli/pkg/jira"
 )
 
-const (
-	configDir  = ".config/jira"
-	configFile = "config.yml"
-)
-
 var (
 	// ErrSkip is returned when a user skips the config generation.
 	ErrSkip = fmt.Errorf("skipping config generation")
@@ -82,9 +77,9 @@ func (c *JiraCLIConfig) Generate() error {
 		if err != nil {
 			return err
 		}
-		c.configPath = fmt.Sprintf("%s/%s", home, configDir)
+		c.configPath = fmt.Sprintf("%s/%s", home, BaseDir)
 
-		return create(c.configPath, configFile)
+		return create(c.configPath, fmt.Sprintf("%s.yml", Name))
 	}(); err != nil {
 		return err
 	}

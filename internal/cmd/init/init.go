@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
 	jiraConfig "github.com/ankitpokhrel/jira-cli/internal/config"
@@ -29,7 +28,7 @@ func initialize(*cobra.Command, []string) {
 	if err := c.Generate(); err != nil {
 		switch err {
 		case jiraConfig.ErrSkip:
-			fmt.Printf("\033[0;32m✓\033[0m Skipping config generation. Current config: %s\n", viper.ConfigFileUsed())
+			fmt.Printf("\033[0;32m✓\033[0m Skipping config generation. Current config: %s\n", jiraConfig.FileUsed())
 		case jira.ErrUnexpectedStatusCode:
 			cmdutil.Errorf("\n\033[0;31m✗\033[0m Received unexpected status code from jira. Please try again.")
 		case jiraConfig.ErrUnexpectedResponseFormat:
@@ -40,5 +39,5 @@ func initialize(*cobra.Command, []string) {
 		os.Exit(1)
 	}
 
-	fmt.Printf("\n\033[0;32m✓\033[0m Configuration generated: %s\n", viper.ConfigFileUsed())
+	fmt.Printf("\n\033[0;32m✓\033[0m Configuration generated: %s\n", jiraConfig.FileUsed())
 }

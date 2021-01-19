@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/ankitpokhrel/jira-cli/api"
 	"github.com/ankitpokhrel/jira-cli/internal/cmd/issue/list"
 	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
+	"github.com/ankitpokhrel/jira-cli/internal/config"
 	"github.com/ankitpokhrel/jira-cli/internal/query"
 	"github.com/ankitpokhrel/jira-cli/internal/view"
 	"github.com/ankitpokhrel/jira-cli/pkg/jira"
@@ -69,9 +69,9 @@ func SetFlags(cmd *cobra.Command) {
 }
 
 func sprintList(cmd *cobra.Command, args []string) {
-	server := viper.GetString("server")
-	project := viper.GetString("project")
-	boardID := viper.GetInt("board.id")
+	server := config.GetServer()
+	project := config.GetProject()
+	boardID := config.GetBoardID()
 
 	debug, err := cmd.Flags().GetBool("debug")
 	cmdutil.ExitIfError(err)
@@ -190,7 +190,7 @@ func sprintExplorerView(flags query.FlagParser, boardID int, project, server str
 
 	v := view.SprintList{
 		Project: project,
-		Board:   viper.GetString("board.name"),
+		Board:   config.GetBoardName(),
 		Server:  server,
 		Data:    sprints,
 		Issues: func(boardID, sprintID int) []*jira.Issue {

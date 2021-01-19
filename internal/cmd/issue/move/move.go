@@ -6,10 +6,10 @@ import (
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/ankitpokhrel/jira-cli/api"
 	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
+	"github.com/ankitpokhrel/jira-cli/internal/config"
 	"github.com/ankitpokhrel/jira-cli/internal/query"
 	"github.com/ankitpokhrel/jira-cli/pkg/jira"
 )
@@ -69,7 +69,7 @@ func move(cmd *cobra.Command, args []string) {
 		cmdutil.ExitIfError(err)
 	}()
 
-	server := viper.GetString("server")
+	server := config.GetServer()
 
 	fmt.Printf("\u001B[0;32m✓\u001B[0m Issue transitioned to state \"%s\"\n", tr.Name)
 	fmt.Printf("%s/browse/%s\n", server, mc.params.key)

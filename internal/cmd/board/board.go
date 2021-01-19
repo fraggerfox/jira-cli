@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/ankitpokhrel/jira-cli/api"
 	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
+	"github.com/ankitpokhrel/jira-cli/internal/config"
 	"github.com/ankitpokhrel/jira-cli/internal/view"
 	"github.com/ankitpokhrel/jira-cli/pkg/jira"
 )
@@ -25,7 +25,7 @@ func NewCmdBoard() *cobra.Command {
 }
 
 func board(cmd *cobra.Command, _ []string) {
-	project := viper.GetString("project")
+	project := config.GetProject()
 
 	debug, err := cmd.Flags().GetBool("debug")
 	cmdutil.ExitIfError(err)

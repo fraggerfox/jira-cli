@@ -21,11 +21,6 @@ import (
 	jiraConfig "github.com/ankitpokhrel/jira-cli/internal/config"
 )
 
-const (
-	configDir  = ".config/jira"
-	configName = "config"
-)
-
 var (
 	config string
 	debug  bool
@@ -42,8 +37,8 @@ func init() {
 				return
 			}
 
-			viper.AddConfigPath(fmt.Sprintf("%s/%s", home, configDir))
-			viper.SetConfigName(configName)
+			viper.AddConfigPath(fmt.Sprintf("%s/%s", home, jiraConfig.BaseDir))
+			viper.SetConfigName(jiraConfig.Name)
 		}
 
 		viper.AutomaticEnv()
@@ -79,11 +74,14 @@ func NewCmdRoot() *cobra.Command {
 
 	cmd.PersistentFlags().StringVarP(
 		&config, "config", "c", "",
-		fmt.Sprintf("Config file (default is $HOME/%s/%s.yml)", configDir, configName),
+		fmt.Sprintf("Config file (default is $HOME/%s/%s.yml)", jiraConfig.BaseDir, jiraConfig.Name),
 	)
 	cmd.PersistentFlags().StringP(
 		"project", "p", "",
-		fmt.Sprintf("Jira project to look into (defaults to value from $HOME/%s/%s.yml)", configDir, configName),
+		fmt.Sprintf(
+			"Jira project to look into (defaults to value from $HOME/%s/%s.yml)",
+			jiraConfig.BaseDir, jiraConfig.Name,
+		),
 	)
 	cmd.PersistentFlags().BoolVar(&debug, "debug", false, "Turn on debug output")
 
