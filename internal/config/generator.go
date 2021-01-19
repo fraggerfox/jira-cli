@@ -18,7 +18,7 @@ import (
 
 const (
 	configDir  = ".config/jira"
-	configFile = ".jira.yml"
+	configFile = "config.yml"
 )
 
 var (
@@ -38,6 +38,7 @@ type JiraCLIConfig struct {
 		epic       *jira.Epic
 		issueTypes []*jira.IssueType
 	}
+	configPath         string
 	jiraClient         *jira.Client
 	projectSuggestions []string
 	boardSuggestions   []string
@@ -81,8 +82,9 @@ func (c *JiraCLIConfig) Generate() error {
 		if err != nil {
 			return err
 		}
+		c.configPath = fmt.Sprintf("%s/%s", home, configDir)
 
-		return create(fmt.Sprintf("%s/%s/", home, configDir), configFile)
+		return create(c.configPath, configFile)
 	}(); err != nil {
 		return err
 	}
@@ -256,15 +258,42 @@ func (c *JiraCLIConfig) configureMetadata() error {
 	return nil
 }
 
-func (c *JiraCLIConfig) write() error {
+func (c *JiraCLIConfig) writeConfig() error {
 	viper.Set("server", c.value.server)
 	viper.Set("login", c.value.login)
 	viper.Set("project", c.value.project)
-	viper.Set("board", c.value.board)
+	viper.Set("board", c.value.board.ID)
 	viper.Set("epic", c.value.epic)
-	viper.Set("issue.types", c.value.issueTypes)
 
 	return viper.WriteConfig()
+}
+
+func (c *JiraCLIConfig) writeProjectMeta() error {
+	cp := fmt.Sprintf("%s/%s/%d", c.configPath, strings.ToLower(c.value.project), c.value.board.ID)
+	if err := create(cp, "_boards.json", "_issuetypes.json"); err != nil {
+		return err
+	}
+
+	meta := viper.New()
+	meta.AddConfigPath(cp)
+	meta.SetConfigType("json")
+
+	meta.SetConfigName("_boards")
+	meta.Set("data", c.value.board)
+	if err := meta.WriteConfig(); err != nil {
+		return err
+	}
+
+	meta.SetConfigName("_issuetypes")
+	meta.Set("data", c.value.issueTypes)
+	return meta.WriteConfig()
+}
+
+func (c *JiraCLIConfig) write() error {
+	if err := c.writeConfig(); err != nil {
+		return err
+	}
+	return c.writeProjectMeta()
 }
 
 func (c *JiraCLIConfig) getProjectSuggestions() error {
@@ -322,20 +351,23 @@ func shallOverwrite() bool {
 	return ans
 }
 
-func create(path, name string) error {
+func create(path string, name ...string) error {
 	if !Exists(path) {
 		if err := os.MkdirAll(path, 0700); err != nil {
 			return err
 		}
 	}
 
-	file := path + name
-	if Exists(file) {
-		if err := os.Rename(file, file+".bkp"); err != nil {
+	for _, n := range name {
+		file := fmt.Sprintf("%s/%s", path, n)
+		if Exists(file) {
+			if err := os.Rename(file, file+".bkp"); err != nil {
+				return err
+			}
+		}
+		if _, err := os.Create(file); err != nil {
 			return err
 		}
 	}
-	_, err := os.Create(file)
-
-	return err
+	return nil
 }

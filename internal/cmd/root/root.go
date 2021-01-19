@@ -23,7 +23,7 @@ import (
 
 const (
 	configDir  = ".config/jira"
-	configName = ".jira"
+	configName = "config"
 )
 
 var (
